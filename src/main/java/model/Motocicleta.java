@@ -27,8 +27,4 @@ public class Motocicleta extends Veiculo {
             default -> 0.0;
         };
     }
-
-    public Object getModelo() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }

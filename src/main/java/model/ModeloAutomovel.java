@@ -8,6 +8,6 @@ package model;
  *
  * @author Pomps
  */
-public class ModeloAutomovel {
-    
+public enum ModeloAutomovel {
+    GOL, CELTA, PALIO
 }
