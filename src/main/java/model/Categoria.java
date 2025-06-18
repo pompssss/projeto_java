@@ -8,6 +8,6 @@ package model;
  *
  * @author Pomps
  */
-public class Categoria {
-    
+public enum Categoria {
+    SUV, SEDAN, ESPORTIVO, HATCH, PICKUP
 }

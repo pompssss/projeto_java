@@ -26,12 +26,11 @@ public abstract class Veiculo implements VeiculoI {
         this.valorDeCompra = valorDeCompra;
         this.placa = placa;
         this.ano = ano;
-        this.locacao = null;
     }
 
     @Override
     public void locar(int dias, Calendar data, Cliente cliente) {
-        if (estado == Estado.DISPONIVEL) {
+        if (estado != Estado.DISPONIVEL) return; {
             this.locacao = new Locacao(dias, getValorDiariaLocacao() * dias, data, cliente);
             this.estado = Estado.LOCADO;
         }
@@ -40,6 +39,7 @@ public abstract class Veiculo implements VeiculoI {
     @Override
     public void vender() {
         this.estado = Estado.VENDIDO;
+        this.locacao = null;
     }
 
     @Override
@@ -63,18 +63,14 @@ public abstract class Veiculo implements VeiculoI {
 
     @Override
     public double getValorParaVenda() {
-        int idade = Calendar.getInstance().get(Calendar.YEAR) - ano;
-        double valor = valorDeCompra - idade * 0.15 * valorDeCompra;
+        int idade = Calendar.getInstance().get(Calendar.YEAR) - this.ano;
+        double valor = valorDeCompra - (idade * 0.15 * valorDeCompra);
         if (valor < 0.1 * valorDeCompra) {
             valor = 0.1 * valorDeCompra;
         }
         return valor;
     }
-
+    
     @Override
     public abstract double getValorDiariaLocacao();
-
-    public Object getPlaca() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-}}
+}

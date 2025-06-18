@@ -8,6 +8,6 @@ package model;
  *
  * @author Pomps
  */
-public class ModeloMotocicleta {
-    
+public enum ModeloMotocicleta {
+    CG_125, CBR_500 
 }

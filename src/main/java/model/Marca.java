@@ -8,6 +8,6 @@ package model;
  *
  * @author Pomps
  */
-public class Marca {
-    
+public enum Marca {
+    FIAT, TOYOTA, HONDA, FORD, CHEVROLET
 }

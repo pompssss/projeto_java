@@ -8,6 +8,6 @@ package model;
  *
  * @author Pomps
  */
-public class Estado {
-    
+public enum Estado {
+    DISPONIVEL, ALUGADO, VENDIDO
 }
