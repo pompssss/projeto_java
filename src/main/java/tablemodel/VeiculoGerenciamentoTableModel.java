@@ -1,22 +1,21 @@
 package tablemodel;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import javax.swing.table.AbstractTableModel;
 import model.Automovel;
 import model.Motocicleta;
 import model.Van;
 import model.Veiculo;
 
-public class VeiculoLocacaoTableModel extends AbstractTableModel {
+public class VeiculoGerenciamentoTableModel extends AbstractTableModel {
 
-    private List<Veiculo> veiculos; // Alterado para ser mutável
-    private final String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Preço Diária"};
+    private List<Veiculo> veiculos;
+    private final String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Estado", "Valor de Compra"};
 
-    public VeiculoLocacaoTableModel(List<Veiculo> veiculos) {
+    public VeiculoGerenciamentoTableModel(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
     }
     
-    // NOVO: Método para atualizar a lista de veículos e notificar a tabela
     public void setVeiculos(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
         fireTableDataChanged();
@@ -45,7 +44,8 @@ public class VeiculoLocacaoTableModel extends AbstractTableModel {
                 else yield "-";
             }
             case 3 -> v.getAno();
-            case 4 -> String.format("R$%.2f", v.getValorDiariaLocacao());
+            case 4 -> v.getEstado();
+            case 5 -> String.format("R$%.2f", v.getValorDeCompra());
             default -> null;
         };
     }
@@ -55,7 +55,6 @@ public class VeiculoLocacaoTableModel extends AbstractTableModel {
         return colunas[column];
     }
     
-    // NOVO: Retorna o objeto Veiculo da linha especificada
     public Veiculo getVeiculoAt(int rowIndex) {
         return veiculos.get(rowIndex);
     }

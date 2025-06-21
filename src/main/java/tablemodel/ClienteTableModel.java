@@ -1,25 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package tablemodel;
 
+import controller.ClienteController;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import model.Cliente;
 
-/**
- *
- * @author Pomps
- */
 public class ClienteTableModel extends AbstractTableModel {
-    private final List<Cliente> clientes;
+    private List<Cliente> clientes;
     private final String[] colunas = {"Nome", "Sobrenome", "RG", "CPF", "Endereço"};
 
     public ClienteTableModel(List<Cliente> clientes) {
         this.clientes = clientes;
     }
 
+    // NOVO: Método para atualizar a lista de clientes e notificar a tabela
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
+        fireTableDataChanged();
+    }
+    
     @Override
     public int getRowCount() { return clientes.size(); }
 
@@ -43,5 +42,8 @@ public class ClienteTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         return colunas[column];
     }
+    
+    public Cliente getClienteAt(int rowIndex) {
+        return clientes.get(rowIndex);
+    }
 }
-

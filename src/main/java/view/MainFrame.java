@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 
+import controller.ClienteController;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
@@ -11,73 +8,91 @@ public class MainFrame extends JFrame {
     private final JTabbedPane tabbedPane;
 
     public MainFrame() {
-        super("Sistema de Locadora");
+        super("Sistema de Locadora de Veículos");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null); // Centraliza a janela
+        setSize(950, 750);
+        setLocationRelativeTo(null);
 
         tabbedPane = new JTabbedPane();
 
         criarMenu();
-        adicionarAbasIniciais();
+        adicionarAbaInicial();
 
         add(tabbedPane);
     }
 
     private void criarMenu() {
         JMenuBar menuBar = new JMenuBar();
-
         JMenu menuCadastro = new JMenu("Cadastros");
 
-        JMenuItem menuCliente = new JMenuItem("Clientes");
-        menuCliente.addActionListener(e -> abrirAba("Clientes", new ClientePanel()));
+        JMenuItem menuCliente = new JMenuItem("Gerenciar Clientes");
+        menuCliente.addActionListener(e -> abrirAba("Clientes", new ClientePanel(ClienteController.listarTodos(), this)));
 
-        JMenuItem menuVeiculo = new JMenuItem("Veículos");
-        menuVeiculo.addActionListener(e -> abrirAba("Veículos", new VeiculoPanel()));
+        JMenuItem menuVeiculo = new JMenuItem("Incluir Novo Veículo");
+        menuVeiculo.addActionListener(e -> abrirAba("Inclusão de Veículos", new VeiculoPanel(this)));
+
+        // NOVO: Menu para gerenciar veículos existentes
+        JMenuItem menuGerenciarVeiculo = new JMenuItem("Gerenciar Veículos");
+        menuGerenciarVeiculo.addActionListener(e -> abrirAba("Gerenciar Frota", new GerenciarVeiculosPanel(this)));
 
         menuCadastro.add(menuCliente);
         menuCadastro.add(menuVeiculo);
+        menuCadastro.add(menuGerenciarVeiculo); // Adicionado ao menu
 
-        JMenu menuLocacao = new JMenu("Locações");
+        JMenu menuOperacoes = new JMenu("Operações");
 
-        JMenuItem menuNovaLocacao = new JMenuItem("Nova Locação");
-        menuNovaLocacao.addActionListener(e -> abrirAba("Locação", new LocacaoPanel()));
+        JMenuItem menuNovaLocacao = new JMenuItem("Realizar Locação");
+        menuNovaLocacao.addActionListener(e -> abrirAba("Locação", new LocacaoPanel(this)));
 
-        JMenuItem menuDevolucao = new JMenuItem("Devolução");
-        menuDevolucao.addActionListener(e -> abrirAba("Devolução", new DevolucaoPanel()));
+        JMenuItem menuDevolucao = new JMenuItem("Realizar Devolução");
+        menuDevolucao.addActionListener(e -> abrirAba("Devolução", new DevolucaoPanel(this)));
 
-        JMenuItem menuVenda = new JMenuItem("Venda");
-        menuVenda.addActionListener(e -> abrirAba("Venda", new VendaPanel()));
+        JMenuItem menuVenda = new JMenuItem("Realizar Venda");
+        menuVenda.addActionListener(e -> abrirAba("Venda", new VendaPanel(this)));
 
-        menuLocacao.add(menuNovaLocacao);
-        menuLocacao.add(menuDevolucao);
-        menuLocacao.add(menuVenda);
+        menuOperacoes.add(menuNovaLocacao);
+        menuOperacoes.add(menuDevolucao);
+        menuOperacoes.add(menuVenda);
 
         menuBar.add(menuCadastro);
-        menuBar.add(menuLocacao);
+        menuBar.add(menuOperacoes);
 
         setJMenuBar(menuBar);
     }
 
-    private void adicionarAbasIniciais() {
-        JLabel bemVindo = new JLabel("Bem-vindo à Locadora!", JLabel.CENTER);
+    private void adicionarAbaInicial() {
+        JLabel bemVindo = new JLabel("Bem-vindo ao Sistema da Locadora!", JLabel.CENTER);
         tabbedPane.addTab("Início", bemVindo);
     }
 
-    private void abrirAba(String titulo, JPanel painel) {
+    public void abrirAba(String titulo, JPanel painel) {
         int index = tabbedPane.indexOfTab(titulo);
         if (index == -1) {
             tabbedPane.addTab(titulo, painel);
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
         } else {
+            tabbedPane.setComponentAt(index, painel);
             tabbedPane.setSelectedIndex(index);
         }
     }
 
+    // NOVO: Método para fechar uma aba específica
+    public void fecharAba(JPanel panel) {
+        int index = tabbedPane.indexOfComponent(panel);
+        if (index != -1) {
+            tabbedPane.remove(index);
+        }
+    }
+
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         SwingUtilities.invokeLater(() -> {
             new MainFrame().setVisible(true);
         });
     }
 }
-

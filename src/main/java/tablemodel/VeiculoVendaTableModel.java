@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package tablemodel;
 
 import java.util.List;
@@ -11,16 +7,17 @@ import model.Motocicleta;
 import model.Van;
 import model.Veiculo;
 
-/**
- *
- * @author Pomps
- */
 public class VeiculoVendaTableModel extends AbstractTableModel {
     private List<Veiculo> veiculos;
-    private String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Preço para venda"};
+    private final String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Preço para venda"};
 
     public VeiculoVendaTableModel(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
+    }
+    
+    public void setVeiculos(List<Veiculo> veiculos) {
+        this.veiculos = veiculos;
+        fireTableDataChanged();
     }
 
     @Override
@@ -36,33 +33,27 @@ public class VeiculoVendaTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Veiculo v = veiculos.get(rowIndex);
-        switch (columnIndex) {
-            case 0 -> {
-                return v.getPlaca();
-            }
-            case 1 -> {
-                return v.getMarca();
-            }
+        return switch (columnIndex) {
+            case 0 -> v.getPlaca();
+            case 1 -> v.getMarca();
             case 2 -> {
-                if (v instanceof Automovel automovel) return automovel.getModelo();
-                if (v instanceof Motocicleta motocicleta) return motocicleta.getModelo();
-                if (v instanceof Van van) return van.getModelo();
-                return "";
+                if (v instanceof Automovel automovel) yield automovel.getModelo();
+                else if (v instanceof Motocicleta motocicleta) yield motocicleta.getModelo();
+                else if (v instanceof Van van) yield van.getModelo();
+                else yield "-";
             }
-            case 3 -> {
-                return String.format("%04d", v.getAno());
-            }
-            case 4 -> {
-                return String.format("R$%.2f", v.getValorParaVenda());
-            }
-            default -> {
-                return "";
-            }
-        }
+            case 3 -> String.format("%04d", v.getAno());
+            case 4 -> String.format("R$%.2f", v.getValorParaVenda());
+            default -> "";
+        };
     }
 
     @Override
     public String getColumnName(int column) {
         return colunas[column];
+    }
+    
+    public Veiculo getVeiculoAt(int rowIndex) {
+        return veiculos.get(rowIndex);
     }
 }

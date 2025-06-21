@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package tablemodel;
 
 import javax.swing.table.AbstractTableModel;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import model.Automovel;
 import model.Locacao;
@@ -14,7 +11,7 @@ import model.Veiculo;
 
 public class VeiculoDevolucaoTableModel extends AbstractTableModel {
 
-    private final List<Veiculo> veiculos;
+    private List<Veiculo> veiculos;
     private final String[] colunas = {
         "Nome do Cliente", "Placa", "Marca", "Modelo", "Ano", 
         "Data Locação", "Preço Diária", "Dias Locados", "Valor Locação"
@@ -22,6 +19,11 @@ public class VeiculoDevolucaoTableModel extends AbstractTableModel {
 
     public VeiculoDevolucaoTableModel(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
+    }
+    
+    public void setVeiculos(List<Veiculo> veiculos) {
+        this.veiculos = veiculos;
+        fireTableDataChanged();
     }
 
     @Override
@@ -38,18 +40,20 @@ public class VeiculoDevolucaoTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Veiculo v = veiculos.get(rowIndex);
         Locacao loc = v.getLocacao();
+        if (loc == null) return null; // Segurança
+        
         return switch (columnIndex) {
-            case 0 -> loc.getCliente().getNome(); // Adapte para nome completo se necessário
+            case 0 -> loc.getCliente().getNome() + " " + loc.getCliente().getSobrenome();
             case 1 -> v.getPlaca();
             case 2 -> v.getMarca();
             case 3 -> {
-                if (!(v instanceof Automovel a)) if (v instanceof Motocicleta m) yield m.getModelo();
+                if (v instanceof Automovel a) yield a.getModelo();
+                else if (v instanceof Motocicleta m) yield m.getModelo();
                 else if (v instanceof Van va) yield va.getModelo();
                 else yield "-";
-                else yield a.getModelo();
             }
             case 4 -> v.getAno();
-            case 5 -> loc.getData().getTime(); // ou formatado com SimpleDateFormat
+            case 5 -> new SimpleDateFormat("dd/MM/yyyy").format(loc.getData().getTime());
             case 6 -> String.format("R$%.2f", v.getValorDiariaLocacao());
             case 7 -> loc.getDias();
             case 8 -> String.format("R$%.2f", loc.getValor());
@@ -61,5 +65,8 @@ public class VeiculoDevolucaoTableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         return colunas[column];
     }
+    
+    public Veiculo getVeiculoAt(int rowIndex) {
+        return veiculos.get(rowIndex);
+    }
 }
-

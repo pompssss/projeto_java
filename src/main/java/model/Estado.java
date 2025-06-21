@@ -1,13 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 /**
- *
+ * Representa os possíveis estados de um veículo no sistema.
+ * Conforme requisito 2.b.iii.
  * @author Pomps
  */
 public enum Estado {
-    DISPONIVEL, ALUGADO, VENDIDO, LOCADO
+    NOVO,       // Estado inicial de um veículo comprado
+    DISPONIVEL, // Disponível para locação ou venda
+    LOCADO,     // Atualmente locado por um cliente
+    VENDIDO     // Já foi vendido e saiu da frota
 }

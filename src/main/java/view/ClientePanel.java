@@ -1,70 +1,163 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 
-/**
- *
- * @author Pomps
- */
-import javax.swing.*;
+import controller.ClienteController;
+import controller.VeiculoController;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
 import model.Cliente;
+import model.Estado;
+import model.Veiculo;
 import tablemodel.ClienteTableModel;
 
 public class ClientePanel extends JPanel {
     private final JTable tabelaClientes;
     private final ClienteTableModel modelo;
-    private final JTextField nomeField;
-    private final JTextField sobrenomeField;
-    private final JTextField rgField;
-    private final JTextField cpfField;
-    private final JTextField enderecoField;
-    private final JButton adicionarBtn;
-    private final JButton atualizarBtn;
-    private final JButton excluirBtn;
+    private final JTextField nomeField, sobrenomeField, rgField, cpfField, enderecoField;
+    private final JButton adicionarBtn, atualizarBtn, excluirBtn, btnRefresh, btnFechar;
+    private final MainFrame mainFrame;
 
-    public ClientePanel(List<Cliente> clientes) {
-        setLayout(new BorderLayout());
+    public ClientePanel(List<Cliente> clientes, MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+        setLayout(new BorderLayout(10, 10));
 
-        modelo = new ClienteTableModel(clientes);
-        tabelaClientes = new JTable(modelo);
+        // --- PAINEL DE AÇÕES SUPERIOR ---
+        JPanel topActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnRefresh = new JButton("Atualizar");
+        btnFechar = new JButton("Fechar Aba");
+        topActionsPanel.add(btnRefresh);
+        topActionsPanel.add(btnFechar);
 
-        JPanel form = new JPanel(new GridLayout(6, 2));
+        // --- PAINEL DE FORMULÁRIO E BOTÕES DE CRUD ---
+        JPanel formAndCrudPanel = new JPanel(new BorderLayout(10, 5));
+        
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5));
         nomeField = new JTextField();
         sobrenomeField = new JTextField();
         rgField = new JTextField();
         cpfField = new JTextField();
         enderecoField = new JTextField();
+        
+        formPanel.add(new JLabel("Nome:"));
+        formPanel.add(nomeField);
+        formPanel.add(new JLabel("Sobrenome:"));
+        formPanel.add(sobrenomeField);
+        formPanel.add(new JLabel("RG:"));
+        formPanel.add(rgField);
+        formPanel.add(new JLabel("CPF:"));
+        formPanel.add(cpfField);
+        formPanel.add(new JLabel("Endereço:"));
+        formPanel.add(enderecoField);
 
-        form.add(new JLabel("Nome:"));
-        form.add(nomeField);
-        form.add(new JLabel("Sobrenome:"));
-        form.add(sobrenomeField);
-        form.add(new JLabel("RG:"));
-        form.add(rgField);
-        form.add(new JLabel("CPF:"));
-        form.add(cpfField);
-        form.add(new JLabel("Endereço:"));
-        form.add(enderecoField);
-
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         adicionarBtn = new JButton("Adicionar");
         atualizarBtn = new JButton("Atualizar");
         excluirBtn = new JButton("Excluir");
+        
+        buttonPanel.add(adicionarBtn);
+        buttonPanel.add(atualizarBtn);
+        buttonPanel.add(excluirBtn);
+        
+        formAndCrudPanel.add(formPanel, BorderLayout.CENTER);
+        formAndCrudPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        // --- PAINEL NORTE (AGRUPA AÇÕES E FORMULÁRIO) ---
+        JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.add(topActionsPanel, BorderLayout.NORTH);
+        northPanel.add(formAndCrudPanel, BorderLayout.CENTER);
 
-        form.add(adicionarBtn);
-        form.add(atualizarBtn);
-        form.add(excluirBtn);
+        add(northPanel, BorderLayout.NORTH);
 
-        add(form, BorderLayout.NORTH);
+        // --- TABELA PRINCIPAL ---
+        modelo = new ClienteTableModel(clientes);
+        tabelaClientes = new JTable(modelo);
         add(new JScrollPane(tabelaClientes), BorderLayout.CENTER);
 
-        // Adicione os listeners para os botões conforme a lógica do seu projeto
+        // --- LISTENERS ---
+        adicionarBtn.addActionListener(e -> adicionarCliente());
+        atualizarBtn.addActionListener(e -> atualizarCliente());
+        excluirBtn.addActionListener(e -> excluirCliente());
+        btnRefresh.addActionListener(e -> refreshData());
+        btnFechar.addActionListener(e -> this.mainFrame.fecharAba(this));
+
+        tabelaClientes.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tabelaClientes.getSelectedRow() != -1) {
+                int selectedRow = tabelaClientes.convertRowIndexToModel(tabelaClientes.getSelectedRow());
+                Cliente clienteSelecionado = modelo.getClienteAt(selectedRow);
+                
+                nomeField.setText(clienteSelecionado.getNome());
+                sobrenomeField.setText(clienteSelecionado.getSobrenome());
+                rgField.setText(clienteSelecionado.getRg());
+                cpfField.setText(clienteSelecionado.getCpf());
+                enderecoField.setText(clienteSelecionado.getEndereco());
+            }
+        });
     }
 
-    ClientePanel() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private void adicionarCliente() {
+        if (camposInvalidos()) {
+            JOptionPane.showMessageDialog(this, "Todos os campos devem ser preenchidos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Cliente novoCliente = new Cliente(nomeField.getText(), sobrenomeField.getText(), rgField.getText(), cpfField.getText(), enderecoField.getText());
+        ClienteController.salvar(novoCliente);
+        JOptionPane.showMessageDialog(this, "Cliente adicionado com sucesso!");
+        refreshData();
+    }
+    
+    private void atualizarCliente() {
+        int selectedRow = tabelaClientes.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um cliente para atualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (camposInvalidos()) {
+            JOptionPane.showMessageDialog(this, "Todos os campos devem ser preenchidos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Cliente clienteAtualizado = new Cliente(nomeField.getText(), sobrenomeField.getText(), rgField.getText(), cpfField.getText(), enderecoField.getText());
+        ClienteController.atualizar(clienteAtualizado);
+        JOptionPane.showMessageDialog(this, "Cliente atualizado com sucesso!");
+        refreshData();
+    }
+    
+    private void excluirCliente() {
+        int selectedRow = tabelaClientes.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um cliente para excluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Cliente clienteSelecionado = modelo.getClienteAt(selectedRow);
+        
+        boolean temLocacao = VeiculoController.listarLocados().stream().anyMatch(v -> v.getLocacao().getCliente().equals(clienteSelecionado));
+        
+        if (temLocacao) {
+            JOptionPane.showMessageDialog(this, "Este cliente não pode ser excluído pois possui veículos locados.", "Erro de Exclusão", JOptionPane.ERROR_MESSAGE);
+        } else {
+            int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir este cliente?", "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                ClienteController.excluir(clienteSelecionado);
+                JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
+                refreshData();
+            }
+        }
+    }
+    
+    private void refreshData() {
+        modelo.setClientes(ClienteController.listarTodos());
+        limparCampos();
+    }
+    
+    private void limparCampos() {
+        nomeField.setText("");
+        sobrenomeField.setText("");
+        rgField.setText("");
+        cpfField.setText("");
+        enderecoField.setText("");
+        tabelaClientes.clearSelection();
+    }
+
+    private boolean camposInvalidos() {
+        return nomeField.getText().trim().isEmpty() || sobrenomeField.getText().trim().isEmpty() || rgField.getText().trim().isEmpty() || cpfField.getText().trim().isEmpty() || enderecoField.getText().trim().isEmpty();
     }
 }

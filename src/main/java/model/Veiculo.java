@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package model;
 
 import java.util.Calendar;
 
-/**
- *
- * @author Pomps
- */
 public abstract class Veiculo implements VeiculoI {
     protected Marca marca;
     protected Estado estado;
@@ -28,9 +20,11 @@ public abstract class Veiculo implements VeiculoI {
         this.ano = ano;
     }
 
+    // --- MÉTODOS DE NEGÓCIO DA INTERFACE ---
+
     @Override
     public void locar(int dias, Calendar data, Cliente cliente) {
-        if (estado != Estado.DISPONIVEL) return; {
+        if (estado == Estado.DISPONIVEL) {
             this.locacao = new Locacao(dias, getValorDiariaLocacao() * dias, data, cliente);
             this.estado = Estado.LOCADO;
         }
@@ -48,6 +42,8 @@ public abstract class Veiculo implements VeiculoI {
         this.estado = Estado.DISPONIVEL;
     }
 
+    // --- GETTERS DA INTERFACE ---
+
     @Override
     public Estado getEstado() { return estado; }
     @Override
@@ -60,13 +56,24 @@ public abstract class Veiculo implements VeiculoI {
     public String getPlaca() { return placa; }
     @Override
     public int getAno() { return ano; }
+    public double getValorDeCompra() { return valorDeCompra; } // Getter adicional útil
+
+    // --- SETTERS (NECESSÁRIOS PARA A TELA DE GERENCIAMENTO) ---
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
+    public void setValorDeCompra(double valorDeCompra) {
+        this.valorDeCompra = valorDeCompra;
+    }
+
 
     @Override
     public double getValorParaVenda() {
         int idade = Calendar.getInstance().get(Calendar.YEAR) - this.ano;
         double valor = valorDeCompra - (idade * 0.15 * valorDeCompra);
-        if (valor < 0.1 * valorDeCompra) {
-            valor = 0.1 * valorDeCompra;
+        if (valor < valorDeCompra * 0.1 || valor <= 0) {
+            valor = valorDeCompra * 0.1;
         }
         return valor;
     }

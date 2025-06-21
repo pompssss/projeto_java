@@ -1,76 +1,143 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import controller.ClienteController;
+import controller.VeiculoController;
+import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import model.Veiculo;
+import javax.swing.*;
+import model.*;
 import tablemodel.VeiculoLocacaoTableModel;
 
-/**
- *
- * @author Pomps
- */
 public class LocacaoPanel extends JPanel {
-
-    private final JTextField clienteField;
-    private final JTextField diasField;
-    private final JTextField dataField;
+    private final JTextField clienteCpfField, diasField, dataField;
     private final JComboBox<String> tipoBox;
-    private final JComboBox<String> marcaBox;
-    private final JComboBox<String> categoriaBox;
+    private final JComboBox<Marca> marcaBox;
+    private final JComboBox<Categoria> categoriaBox;
     private final JTable tabelaVeiculos;
-    private final JButton locarBtn;
+    private final VeiculoLocacaoTableModel tableModel;
+    private final JButton locarBtn, filtrarBtn, btnFechar;
+    private final MainFrame mainFrame;
 
-    public LocacaoPanel(List<Veiculo> veiculosDisponiveis) {
-        setLayout(new BorderLayout());
+    public LocacaoPanel(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+        setLayout(new BorderLayout(10, 10));
 
-        JPanel filtros = new JPanel(new GridLayout(2, 4));
-        clienteField = new JTextField();
-        diasField = new JTextField();
-        dataField = new JTextField();
-        tipoBox = new JComboBox<>(new String[]{"Automóvel", "Van", "Motocicleta"});
-        marcaBox = new JComboBox<>(); // Preencha com marcas disponíveis
-        categoriaBox = new JComboBox<>(); // Preencha com categorias disponíveis
+        // --- PAINEL NORTE (FILTROS E AÇÕES) ---
+        JPanel northPanel = new JPanel(new BorderLayout());
+        JPanel topActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        filtrarBtn = new JButton("Atualizar / Filtrar");
+        btnFechar = new JButton("Fechar Aba");
+        topActionsPanel.add(filtrarBtn);
+        topActionsPanel.add(btnFechar);
+        northPanel.add(topActionsPanel, BorderLayout.NORTH);
 
-        filtros.add(new JLabel("Cliente:"));
-        filtros.add(clienteField);
-        filtros.add(new JLabel("Tipo:"));
-        filtros.add(tipoBox);
-        filtros.add(new JLabel("Marca:"));
-        filtros.add(marcaBox);
-        filtros.add(new JLabel("Categoria:"));
-        filtros.add(categoriaBox);
+        JPanel filtrosPanel = new JPanel(new GridLayout(2, 4, 5, 5));
+        tipoBox = new JComboBox<>(new String[]{"Todos", "Automóvel", "Van", "Motocicleta"});
+        marcaBox = new JComboBox<>();
+        categoriaBox = new JComboBox<>();
+        
+        marcaBox.addItem(null); // Representa "Todas"
+        for(Marca m : Marca.values()) marcaBox.addItem(m);
+        categoriaBox.addItem(null); // Representa "Todas"
+        for(Categoria c : Categoria.values()) categoriaBox.addItem(c);
 
-        add(filtros, BorderLayout.NORTH);
+        filtrosPanel.add(new JLabel("Tipo Veículo:"));
+        filtrosPanel.add(tipoBox);
+        filtrosPanel.add(new JLabel("Marca:"));
+        filtrosPanel.add(marcaBox);
+        filtrosPanel.add(new JLabel("Categoria:"));
+        filtrosPanel.add(categoriaBox);
+        northPanel.add(filtrosPanel, BorderLayout.CENTER);
+        
+        add(northPanel, BorderLayout.NORTH);
 
-        tabelaVeiculos = new JTable(new VeiculoLocacaoTableModel(veiculosDisponiveis));
+        // --- TABELA DE VEÍCULOS ---
+        tableModel = new VeiculoLocacaoTableModel(VeiculoController.listarDisponiveis());
+        tabelaVeiculos = new JTable(tableModel);
         add(new JScrollPane(tabelaVeiculos), BorderLayout.CENTER);
 
-        JPanel southPanel = new JPanel();
+        // --- PAINEL SUL (AÇÃO DE LOCAR) ---
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        clienteCpfField = new JTextField(10);
+        diasField = new JTextField(5);
+        dataField = new JTextField(10);
+        locarBtn = new JButton("Locar Veículo Selecionado");
+
+        southPanel.add(new JLabel("CPF Cliente:"));
+        southPanel.add(clienteCpfField);
         southPanel.add(new JLabel("Dias:"));
         southPanel.add(diasField);
-        southPanel.add(new JLabel("Data:"));
+        southPanel.add(new JLabel("Data (dd/MM/yyyy):"));
         southPanel.add(dataField);
-        locarBtn = new JButton("Locar");
         southPanel.add(locarBtn);
-
         add(southPanel, BorderLayout.SOUTH);
 
-        // Adicione listeners para filtrar e locar veículos
+        // --- LISTENERS ---
+        filtrarBtn.addActionListener(e -> filtrarVeiculos());
+        btnFechar.addActionListener(e -> this.mainFrame.fecharAba(this));
+        locarBtn.addActionListener(e -> locarVeiculo());
+    }
+    
+    private void filtrarVeiculos() {
+        String tipo = (String) tipoBox.getSelectedItem();
+        Marca marca = (Marca) marcaBox.getSelectedItem();
+        Categoria categoria = (Categoria) categoriaBox.getSelectedItem();
+
+        List<Veiculo> veiculosFiltrados = VeiculoController.listarDisponiveis().stream()
+            .filter(v -> tipo.equals("Todos") || v.getClass().getSimpleName().equalsIgnoreCase(tipo))
+            .filter(v -> marca == null || v.getMarca().equals(marca))
+            .filter(v -> categoria == null || v.getCategoria().equals(categoria))
+            .toList();
+        
+        tableModel.setVeiculos(veiculosFiltrados);
     }
 
-    LocacaoPanel() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private void locarVeiculo() {
+        int selectedRow = tabelaVeiculos.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um veículo para locar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String cpfCliente = clienteCpfField.getText();
+        if (cpfCliente.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Informe o CPF do cliente.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Cliente cliente = ClienteController.buscarPorCpf(cpfCliente);
+        if (cliente == null) {
+            JOptionPane.showMessageDialog(this, "Cliente com CPF " + cpfCliente + " não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            int dias = Integer.parseInt(diasField.getText());
+            if (dias <= 0) throw new NumberFormatException();
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sdf.setLenient(false);
+            Calendar dataLocacao = Calendar.getInstance();
+            dataLocacao.setTime(sdf.parse(dataField.getText()));
+
+            Veiculo veiculo = tableModel.getVeiculoAt(tabelaVeiculos.convertRowIndexToModel(selectedRow));
+            veiculo.locar(dias, dataLocacao, cliente);
+            VeiculoController.atualizar(veiculo);
+
+            JOptionPane.showMessageDialog(this, "Veículo " + veiculo.getPlaca() + " locado para " + cliente.getNome() + " com sucesso!");
+
+            clienteCpfField.setText("");
+            diasField.setText("");
+            dataField.setText("");
+            filtrarVeiculos();
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "O número de dias deve ser um inteiro positivo.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, "Formato de data inválido. Use dd/MM/yyyy.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
