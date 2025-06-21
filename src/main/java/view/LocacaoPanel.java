@@ -22,10 +22,15 @@ import tablemodel.VeiculoLocacaoTableModel;
  * @author Pomps
  */
 public class LocacaoPanel extends JPanel {
-    private JTextField clienteField, diasField, dataField;
-    private JComboBox<String> tipoBox, marcaBox, categoriaBox;
-    private JTable tabelaVeiculos;
-    private JButton locarBtn;
+
+    private final JTextField clienteField;
+    private final JTextField diasField;
+    private final JTextField dataField;
+    private final JComboBox<String> tipoBox;
+    private final JComboBox<String> marcaBox;
+    private final JComboBox<String> categoriaBox;
+    private final JTable tabelaVeiculos;
+    private final JButton locarBtn;
 
     public LocacaoPanel(List<Veiculo> veiculosDisponiveis) {
         setLayout(new BorderLayout());
@@ -63,5 +68,9 @@ public class LocacaoPanel extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
 
         // Adicione listeners para filtrar e locar veículos
+    }
+
+    LocacaoPanel() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

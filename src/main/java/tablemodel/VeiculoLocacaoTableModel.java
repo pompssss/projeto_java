@@ -11,6 +11,10 @@ package tablemodel;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import model.Automovel;
+import model.Motocicleta;
+import model.Van;
+import model.Veiculo;
 
 public class VeiculoLocacaoTableModel extends AbstractTableModel {
 

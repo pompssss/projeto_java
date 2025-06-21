@@ -6,6 +6,11 @@ package tablemodel;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import model.Automovel;
+import model.Locacao;
+import model.Motocicleta;
+import model.Van;
+import model.Veiculo;
 
 public class VeiculoDevolucaoTableModel extends AbstractTableModel {
 
@@ -38,10 +43,10 @@ public class VeiculoDevolucaoTableModel extends AbstractTableModel {
             case 1 -> v.getPlaca();
             case 2 -> v.getMarca();
             case 3 -> {
-                if (v instanceof Automovel a) yield a.getModelo();
-                else if (v instanceof Motocicleta m) yield m.getModelo();
+                if (!(v instanceof Automovel a)) if (v instanceof Motocicleta m) yield m.getModelo();
                 else if (v instanceof Van va) yield va.getModelo();
                 else yield "-";
+                else yield a.getModelo();
             }
             case 4 -> v.getAno();
             case 5 -> loc.getData().getTime(); // ou formatado com SimpleDateFormat

@@ -4,40 +4,66 @@
  */
 package view;
 
+import controller.VeiculoController;
 import java.awt.GridLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import model.Categoria;
-import model.Estado;
-import model.Marca;
+import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import javax.swing.*;
 
-/**
- *
- * @author Pomps
- */
+import model.*;
+
 public class VeiculoPanel extends JPanel {
-    private JComboBox<Marca> marcaBox;
-    private JComboBox<Estado> estadoBox;
-    private JComboBox<Categoria> categoriaBox;
-    private JComboBox<Object> modeloBox; // Use o tipo correto conforme o veículo
-    private JTextField valorDeCompraField, placaField, anoField;
-    private JButton incluirBtn;
+    private final JComboBox<String> tipoVeiculoBox;
+    private final JComboBox<Marca> marcaBox;
+    private final JComboBox<Estado> estadoBox;
+    private final JComboBox<Categoria> categoriaBox;
+    private final JComboBox<Object> modeloBox;
+    private final JTextField valorDeCompraField;
+    private final JTextField placaField;
+    private final JTextField anoField;
+    private final JButton incluirBtn;
 
     public VeiculoPanel() {
-        setLayout(new GridLayout(8, 2));
+        setLayout(new GridLayout(9, 2)); // aumentou uma linha por causa do novo campo
 
+        tipoVeiculoBox = new JComboBox<>(new String[] { "Automóvel", "Motocicleta", "Van" });
         marcaBox = new JComboBox<>(Marca.values());
         estadoBox = new JComboBox<>(Estado.values());
         categoriaBox = new JComboBox<>(Categoria.values());
-        modeloBox = new JComboBox<>(); // Preencha conforme o tipo selecionado
+        modeloBox = new JComboBox<>();
         valorDeCompraField = new JTextField();
         placaField = new JTextField();
         anoField = new JTextField();
         incluirBtn = new JButton("Incluir Veículo");
 
+        incluirBtn.addActionListener((ActionEvent e) -> {
+            try {
+                String tipo = (String) tipoVeiculoBox.getSelectedItem();
+                Marca marca = (Marca) marcaBox.getSelectedItem();
+                Estado estado = (Estado) estadoBox.getSelectedItem();
+                Categoria categoria = (Categoria) categoriaBox.getSelectedItem();
+                Object modelo = modeloBox.getSelectedItem();
+                double valorDeCompra = Double.parseDouble(valorDeCompraField.getText());
+                String placa = placaField.getText();
+                int ano = Integer.parseInt(anoField.getText());
+                
+                Veiculo veiculo = null;
+                switch (tipo) {
+                    case "Automóvel" -> veiculo = new Automovel(
+                            marca, estado, categoria, valorDeCompra, placa, ano, (ModeloAutomovel) modelo
+                    );
+                    // Adicione cases para Motocicleta e Van
+                }
+                
+                VeiculoController.salvar(veiculo);
+                
+                JOptionPane.showMessageDialog(VeiculoPanel.this, "Veículo incluído com sucesso!");
+            } catch (HeadlessException | NumberFormatException ex) {
+                JOptionPane.showMessageDialog(VeiculoPanel.this, "Erro ao incluir veículo: " + ex.getMessage());
+            }
+        });
+        add(new JLabel("Tipo de Veículo:"));
+        add(tipoVeiculoBox);
         add(new JLabel("Marca:"));
         add(marcaBox);
         add(new JLabel("Estado:"));
@@ -54,6 +80,38 @@ public class VeiculoPanel extends JPanel {
         add(anoField);
         add(incluirBtn);
 
-        // Adicione listeners para atualizar modeloBox conforme o tipo de veículo
+        tipoVeiculoBox.addActionListener((ActionEvent e) -> {
+            atualizarModelos();
+        });
+
+        // Atualiza os modelos no início
+        atualizarModelos();
+    
     }
+
+    private void atualizarModelos() {
+        modeloBox.removeAllItems();
+        String tipoSelecionado = (String) tipoVeiculoBox.getSelectedItem();
+
+        if (null != tipoSelecionado) switch (tipoSelecionado) {
+            case "Automóvel" -> {
+                for (ModeloAutomovel modelo : ModeloAutomovel.values()) {
+                    modeloBox.addItem(modelo);
+                }
+            }
+            case "Motocicleta" -> {
+                for (ModeloMotocicleta modelo : ModeloMotocicleta.values()) {
+                    modeloBox.addItem(modelo);
+                }
+            }
+            case "Van" -> {
+                for (ModeloVan modelo : ModeloVan.values()) {
+                    modeloBox.addItem(modelo);
+                }
+            }
+            default -> {
+            }
+        }
+    }
+    
 }

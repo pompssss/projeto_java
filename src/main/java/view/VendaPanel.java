@@ -18,8 +18,8 @@ import tablemodel.VeiculoVendaTableModel;
  * @author Pomps
  */
 public class VendaPanel extends JPanel {
-    private JTable tabelaVenda;
-    private JButton venderBtn;
+    private final JTable tabelaVenda;
+    private final JButton venderBtn;
 
     public VendaPanel(List<Veiculo> veiculosDisponiveis) {
         setLayout(new BorderLayout());
@@ -30,5 +30,9 @@ public class VendaPanel extends JPanel {
         add(venderBtn, BorderLayout.SOUTH);
 
         // Adicione listener para vender veículo selecionado
+    }
+
+    VendaPanel() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

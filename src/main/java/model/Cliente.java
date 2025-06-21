@@ -4,16 +4,12 @@
  */
 package model;
 
-/**
- *
- * @author Pomps
- */
 public class Cliente {
-    private String nome;
-    private String sobrenome;
-    private String rg;
-    private String cpf;
-    private String endereco;
+    private final String nome;
+    private final String sobrenome;
+    private final String rg;
+    private final String cpf;
+    private final String endereco;
 
     public Cliente(String nome, String sobrenome, String rg, String cpf, String endereco) {
         this.nome = nome;
@@ -23,5 +19,26 @@ public class Cliente {
         this.endereco = endereco;
     }
 
-    // Getters e setters conforme necessário
+    public String getNome() {
+        return nome;
+    }
+
+    public String getSobrenome() {
+        return sobrenome;
+    }
+
+    public String getRg() {
+        return rg;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    // Se quiser, também pode gerar os setters futuramente
 }
+

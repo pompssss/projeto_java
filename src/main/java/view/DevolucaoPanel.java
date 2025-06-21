@@ -18,8 +18,8 @@ import tablemodel.VeiculoDevolucaoTableModel;
  * @author Pomps
  */
 public class DevolucaoPanel extends JPanel {
-    private JTable tabelaLocados;
-    private JButton devolverBtn;
+    private final JTable tabelaLocados;
+    private final JButton devolverBtn;
 
     public DevolucaoPanel(List<Veiculo> veiculosLocados) {
         setLayout(new BorderLayout());
@@ -30,5 +30,9 @@ public class DevolucaoPanel extends JPanel {
         add(devolverBtn, BorderLayout.SOUTH);
 
         // Adicione listener para devolver veículo selecionado
+    }
+
+    DevolucaoPanel() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

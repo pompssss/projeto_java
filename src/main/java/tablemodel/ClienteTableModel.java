@@ -4,12 +4,16 @@
  */
 package tablemodel;
 
+import java.util.List;
+import javax.swing.table.AbstractTableModel;
+import model.Cliente;
+
 /**
  *
  * @author Pomps
  */
 public class ClienteTableModel extends AbstractTableModel {
-    private List<Cliente> clientes;
+    private final List<Cliente> clientes;
     private final String[] colunas = {"Nome", "Sobrenome", "RG", "CPF", "Endereço"};
 
     public ClienteTableModel(List<Cliente> clientes) {

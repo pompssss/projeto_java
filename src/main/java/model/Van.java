@@ -9,7 +9,7 @@ package model;
  * @author Pomps
  */
 public class Van extends Veiculo {
-    private ModeloVan modelo;
+    private final ModeloVan modelo;
 
     public Van(Marca marca, Estado estado, Categoria categoria, double valorDeCompra, String placa, int ano, ModeloVan modelo) {
         super(marca, estado, categoria, valorDeCompra, placa, ano);
@@ -27,3 +27,4 @@ public class Van extends Veiculo {
             default -> 0.0;
         };
     }
+}

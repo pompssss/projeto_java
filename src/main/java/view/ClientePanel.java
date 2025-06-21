@@ -15,10 +15,16 @@ import model.Cliente;
 import tablemodel.ClienteTableModel;
 
 public class ClientePanel extends JPanel {
-    private JTable tabelaClientes;
-    private ClienteTableModel modelo;
-    private JTextField nomeField, sobrenomeField, rgField, cpfField, enderecoField;
-    private JButton adicionarBtn, atualizarBtn, excluirBtn;
+    private final JTable tabelaClientes;
+    private final ClienteTableModel modelo;
+    private final JTextField nomeField;
+    private final JTextField sobrenomeField;
+    private final JTextField rgField;
+    private final JTextField cpfField;
+    private final JTextField enderecoField;
+    private final JButton adicionarBtn;
+    private final JButton atualizarBtn;
+    private final JButton excluirBtn;
 
     public ClientePanel(List<Cliente> clientes) {
         setLayout(new BorderLayout());
@@ -56,5 +62,9 @@ public class ClientePanel extends JPanel {
         add(new JScrollPane(tabelaClientes), BorderLayout.CENTER);
 
         // Adicione os listeners para os botões conforme a lógica do seu projeto
+    }
+
+    ClientePanel() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

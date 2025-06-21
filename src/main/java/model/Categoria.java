@@ -9,5 +9,5 @@ package model;
  * @author Pomps
  */
 public enum Categoria {
-    SUV, SEDAN, ESPORTIVO, HATCH, PICKUP
+    POPULAR, INTERMEDIARIO, LUXO
 }

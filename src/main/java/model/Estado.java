@@ -9,5 +9,5 @@ package model;
  * @author Pomps
  */
 public enum Estado {
-    DISPONIVEL, ALUGADO, VENDIDO
+    DISPONIVEL, ALUGADO, VENDIDO, LOCADO
 }
