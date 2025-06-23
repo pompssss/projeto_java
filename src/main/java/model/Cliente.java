@@ -38,7 +38,5 @@ public class Cliente {
     public String getEndereco() {
         return endereco;
     }
-
-    // Se quiser, também pode gerar os setters futuramente
 }
 
