@@ -2,21 +2,21 @@ package tablemodel;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
-import model.Automovel;
-import model.Motocicleta;
-import model.Van;
 import model.Veiculo;
 
+/**
+ * TableModel para a tabela de Locação de Veículos. 
+ * Exibe os veículos disponíveis para locação. 
+ */
 public class VeiculoLocacaoTableModel extends AbstractTableModel {
 
-    private List<Veiculo> veiculos; // Alterado para ser mutável
-    private final String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Preço Diária"};
+    private List<Veiculo> veiculos;
+    private final String[] colunas = {"Placa", "Marca", "Modelo", "Ano", "Preço Diária"}; 
 
     public VeiculoLocacaoTableModel(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
     }
     
-    // NOVO: Método para atualizar a lista de veículos e notificar a tabela
     public void setVeiculos(List<Veiculo> veiculos) {
         this.veiculos = veiculos;
         fireTableDataChanged();
@@ -35,16 +35,14 @@ public class VeiculoLocacaoTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Veiculo v = veiculos.get(rowIndex);
+        // Retorna o valor correto com base na coluna.
         return switch (columnIndex) {
             case 0 -> v.getPlaca();
             case 1 -> v.getMarca();
-            case 2 -> {
-                if (v instanceof Automovel a) yield a.getModelo();
-                else if (v instanceof Motocicleta m) yield m.getModelo();
-                else if (v instanceof Van va) yield va.getModelo();
-                else yield "-";
-            }
+            // REATORADO: Usa polimorfismo.
+            case 2 -> v.getModelo();
             case 3 -> v.getAno();
+            // Formata o preço para o padrão R$XXX,XX 
             case 4 -> String.format("R$%.2f", v.getValorDiariaLocacao());
             default -> null;
         };
@@ -55,7 +53,6 @@ public class VeiculoLocacaoTableModel extends AbstractTableModel {
         return colunas[column];
     }
     
-    // NOVO: Retorna o objeto Veiculo da linha especificada
     public Veiculo getVeiculoAt(int rowIndex) {
         return veiculos.get(rowIndex);
     }

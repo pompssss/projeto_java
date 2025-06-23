@@ -28,27 +28,25 @@ public class MainFrame extends JFrame {
         JMenuItem menuCliente = new JMenuItem("Gerenciar Clientes");
         menuCliente.addActionListener(e -> abrirAba("Clientes", new ClientePanel(ClienteController.listarTodos(), this)));
 
-        JMenuItem menuVeiculo = new JMenuItem("Incluir Novo Veículo");
-        menuVeiculo.addActionListener(e -> abrirAba("Inclusão de Veículos", new VeiculoPanel(this)));
+        // O menu "Incluir Novo Veículo" foi REMOVIDO.
 
-        // NOVO: Menu para gerenciar veículos existentes
+        // Menu para gerenciar veículos existentes (agora a única opção)
         JMenuItem menuGerenciarVeiculo = new JMenuItem("Gerenciar Veículos");
-        menuGerenciarVeiculo.addActionListener(e -> abrirAba("Gerenciar Frota", new GerenciarVeiculosPanel(this)));
+        menuGerenciarVeiculo.addActionListener(e -> abrirAba("Gerenciar Frota", new GerenciarVeiculosPanel(this))); //
 
         menuCadastro.add(menuCliente);
-        menuCadastro.add(menuVeiculo);
         menuCadastro.add(menuGerenciarVeiculo); // Adicionado ao menu
 
         JMenu menuOperacoes = new JMenu("Operações");
 
         JMenuItem menuNovaLocacao = new JMenuItem("Realizar Locação");
-        menuNovaLocacao.addActionListener(e -> abrirAba("Locação", new LocacaoPanel(this)));
+        menuNovaLocacao.addActionListener(e -> abrirAba("Locação", new LocacaoPanel(this))); //
 
         JMenuItem menuDevolucao = new JMenuItem("Realizar Devolução");
-        menuDevolucao.addActionListener(e -> abrirAba("Devolução", new DevolucaoPanel(this)));
+        menuDevolucao.addActionListener(e -> abrirAba("Devolução", new DevolucaoPanel(this))); //
 
         JMenuItem menuVenda = new JMenuItem("Realizar Venda");
-        menuVenda.addActionListener(e -> abrirAba("Venda", new VendaPanel(this)));
+        menuVenda.addActionListener(e -> abrirAba("Venda", new VendaPanel(this))); //
 
         menuOperacoes.add(menuNovaLocacao);
         menuOperacoes.add(menuDevolucao);
@@ -76,7 +74,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // NOVO: Método para fechar uma aba específica
     public void fecharAba(JPanel panel) {
         int index = tabbedPane.indexOfComponent(panel);
         if (index != -1) {

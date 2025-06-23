@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package model;
 
 import java.util.Calendar;
 
 /**
- *
- * @author Pomps
+ * Interface que define o contrato para todas as entidades Veículo. 
+ * Especifica os métodos de negócio e getters obrigatórios. 
  */
 public interface VeiculoI {
     void locar(int dias, Calendar data, Cliente cliente);
@@ -20,6 +16,7 @@ public interface VeiculoI {
     Locacao getLocacao();
     String getPlaca();
     int getAno();
+    Object getModelo(); // ADICIONADO PARA POLIMORFISMO
     double getValorParaVenda();
     double getValorDiariaLocacao();
 }

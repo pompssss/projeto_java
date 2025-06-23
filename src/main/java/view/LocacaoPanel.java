@@ -6,12 +6,15 @@ import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import javax.swing.*;
 import model.*;
 import tablemodel.VeiculoLocacaoTableModel;
 
+/**
+ * Painel da UI para a funcionalidade de Locação de Veículos.
+ */
 public class LocacaoPanel extends JPanel {
+    // --- Componentes da Interface Gráfica ---
     private final JTextField clienteCpfField, diasField, dataField;
     private final JComboBox<String> tipoBox;
     private final JComboBox<Marca> marcaBox;
@@ -21,12 +24,18 @@ public class LocacaoPanel extends JPanel {
     private final JButton locarBtn, filtrarBtn, btnFechar;
     private final MainFrame mainFrame;
 
+    /**
+     * Construtor do painel de Locação.
+     * @param mainFrame A referência ao frame principal da aplicação.
+     */
     public LocacaoPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         setLayout(new BorderLayout(10, 10));
 
         // --- PAINEL NORTE (FILTROS E AÇÕES) ---
         JPanel northPanel = new JPanel(new BorderLayout());
+        
+        // Subpainel para botões no topo.
         JPanel topActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         filtrarBtn = new JButton("Atualizar / Filtrar");
         btnFechar = new JButton("Fechar Aba");
@@ -34,14 +43,16 @@ public class LocacaoPanel extends JPanel {
         topActionsPanel.add(btnFechar);
         northPanel.add(topActionsPanel, BorderLayout.NORTH);
 
+        // Subpainel para os campos de filtro.
         JPanel filtrosPanel = new JPanel(new GridLayout(2, 4, 5, 5));
         tipoBox = new JComboBox<>(new String[]{"Todos", "Automóvel", "Van", "Motocicleta"});
         marcaBox = new JComboBox<>();
         categoriaBox = new JComboBox<>();
         
-        marcaBox.addItem(null); // Representa "Todas"
+        // Adiciona a opção "Todas" (representada por null) e depois os valores do enum.
+        marcaBox.addItem(null);
         for(Marca m : Marca.values()) marcaBox.addItem(m);
-        categoriaBox.addItem(null); // Representa "Todas"
+        categoriaBox.addItem(null);
         for(Categoria c : Categoria.values()) categoriaBox.addItem(c);
 
         filtrosPanel.add(new JLabel("Tipo Veículo:"));
@@ -81,33 +92,38 @@ public class LocacaoPanel extends JPanel {
         locarBtn.addActionListener(e -> locarVeiculo());
     }
     
+    /**
+     * Filtra os veículos com base nos valores selecionados nos ComboBoxes.
+     */
     private void filtrarVeiculos() {
+        // Coleta os valores dos filtros.
         String tipo = (String) tipoBox.getSelectedItem();
         Marca marca = (Marca) marcaBox.getSelectedItem();
         Categoria categoria = (Categoria) categoriaBox.getSelectedItem();
 
-        List<Veiculo> veiculosFiltrados = VeiculoController.listarDisponiveis().stream()
-            .filter(v -> tipo.equals("Todos") || v.getClass().getSimpleName().equalsIgnoreCase(tipo))
-            .filter(v -> marca == null || v.getMarca().equals(marca))
-            .filter(v -> categoria == null || v.getCategoria().equals(categoria))
-            .toList();
-        
-        tableModel.setVeiculos(veiculosFiltrados);
+        // REATORADO: Usa o novo método centralizado do VeiculoController.
+        tableModel.setVeiculos(VeiculoController.listarDisponiveisComFiltro(tipo, marca, categoria));
     }
 
+    /**
+     * Executa a lógica para locar um veículo selecionado.
+     */
     private void locarVeiculo() {
+        // Valida se um veículo foi selecionado.
         int selectedRow = tabelaVeiculos.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Selecione um veículo para locar.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // Valida se o CPF do cliente foi informado.
         String cpfCliente = clienteCpfField.getText();
         if (cpfCliente.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Informe o CPF do cliente.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // Busca o cliente pelo CPF.
         Cliente cliente = ClienteController.buscarPorCpf(cpfCliente);
         if (cliente == null) {
             JOptionPane.showMessageDialog(this, "Cliente com CPF " + cpfCliente + " não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -115,20 +131,23 @@ public class LocacaoPanel extends JPanel {
         }
 
         try {
+            // Converte e valida os dias e a data.
             int dias = Integer.parseInt(diasField.getText());
             if (dias <= 0) throw new NumberFormatException();
             
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            sdf.setLenient(false);
+            sdf.setLenient(false); // Impede datas inválidas como 32/01/2025
             Calendar dataLocacao = Calendar.getInstance();
             dataLocacao.setTime(sdf.parse(dataField.getText()));
 
+            // Obtém o veículo, executa a locação e atualiza no controller.
             Veiculo veiculo = tableModel.getVeiculoAt(tabelaVeiculos.convertRowIndexToModel(selectedRow));
             veiculo.locar(dias, dataLocacao, cliente);
             VeiculoController.atualizar(veiculo);
 
             JOptionPane.showMessageDialog(this, "Veículo " + veiculo.getPlaca() + " locado para " + cliente.getNome() + " com sucesso!");
 
+            // Limpa os campos e atualiza a tabela.
             clienteCpfField.setText("");
             diasField.setText("");
             dataField.setText("");
